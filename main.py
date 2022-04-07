@@ -5,7 +5,7 @@ import json
 import requests
 
 # Team Name: Machos
-# Group Members: Shin Cho, Rebecca Mao
+# Group Members: Shin Cho and Rebecca Mao
 
 def setUpDatabase(db_name):
     path = os.path.dirname(os.path.abspath(__file__))
