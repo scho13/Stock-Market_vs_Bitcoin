@@ -14,7 +14,7 @@ def setUpDatabase(db_name):
     return cur, conn
 
 def usfm_api():
-    response_API = requests.get('USFR_StmtNetCost_20110930_20210930.json')
+    response_API = requests.get('https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/statement_net_cost')
     data = response_API.text
     parse_json = json.loads(data)
     return parse_json
