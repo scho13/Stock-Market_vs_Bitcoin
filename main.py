@@ -25,4 +25,6 @@ def bitcoin_api(date):
     data = response.json()
     return data
 
-def collect_bitcoin():
+def bitcoin_table(data, cur, conn):
+    cur.execute("CREATE TABLE IF NOT EXISTS Bitcoin Table (date TEXT, open INTEGER, high INTEGER, low INTEGER, close INTEGER)")
+    conn.commit()
