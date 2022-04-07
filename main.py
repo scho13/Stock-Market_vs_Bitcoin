@@ -19,6 +19,8 @@ def usfm_api():
     parse_json = json.loads(data)
     return parse_json
 
+print(usfm_api())
+
 def bitcoin_api(date):
     base_url = "https://api.coinpaprika.com/v1/"
     response = requests.get(base_url + "coins/btc-bitcoin/ohlcv/historical?start=" + date)
