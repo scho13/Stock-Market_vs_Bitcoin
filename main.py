@@ -24,3 +24,5 @@ def bitcoin_api(date):
     response = requests.get(base_url + "coins/btc-bitcoin/ohlcv/historical?start=" + date)
     data = response.json()
     return data
+
+def collect_bitcoin():
