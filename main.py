@@ -28,5 +28,9 @@ def bitcoin_api(date):
     return data
 
 def bitcoin_table(data, cur, conn):
-    cur.execute("CREATE TABLE IF NOT EXISTS Bitcoin Table (date TEXT, open INTEGER, high INTEGER, low INTEGER, close INTEGER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS Bitcoin Table (date TEXT, open NUMBER, high NUMBER, low NUMBER, close NUMBER)")
+    conn.commit()
+
+def usfm_table(data, cur, conn):
+    cur.execute("CREATE TABLE IF NOT EXISTS USFM Table (date TEXT, Total Net Cost NUMBER")
     conn.commit()
