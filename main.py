@@ -13,22 +13,39 @@ def setUpDatabase(db_name):
     cur = conn.cursor()
     return cur, conn
 
-def usfm_api():
-    response_API = requests.get('https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/statement_net_cost')
-    data = response_API.text
-    parse_json = json.loads(data)
-    return parse_json
 
-def bitcoin_api(date):
+def bitcoin_api():
     base_url = "https://api.coinpaprika.com/v1/"
-    response = requests.get(base_url + "coins/btc-bitcoin/ohlcv/historical?start=" + date)
+    start_date = "2022-01-01"
+    end_date = "2022-04-01"
+    response = requests.get(base_url + "coins/btc-bitcoin/ohlcv/historical?start=" + start_date + "&end=" + end_date)
     data = response.json()
     return data
 
-def bitcoin_table(data, cur, conn):
-    cur.execute("CREATE TABLE IF NOT EXISTS Bitcoin Table (date TEXT, open NUMBER, high NUMBER, low NUMBER, close NUMBER)")
+def bitcoin_table(cur, conn):
+    cur.execute("CREATE TABLE IF NOT EXISTS Bitcoin (date TEXT, open NUMBER, high NUMBER, low NUMBER, close NUMBER)")
+    conn.commit()
+    data = bitcoin_api()
+    for i in data:
+        date = i['time_open'][:10]
+        start = float(i['open'])
+        high = float(i['high'])
+        low = float(i['low'])
+        close = float(i['close'])
+
+        cur.execute(
+        '''
+        INSERT OR IGNORE INTO Bitcoin (date, open, high, low, close)
+        VALUES (?,?,?,?,?)
+        ''',
+        (date, start, high, low, close)
+        )
     conn.commit()
 
-def usfm_table(data, cur, conn):
-    cur.execute("CREATE TABLE IF NOT EXISTS USFM Table (date TEXT, Total Net Cost NUMBER")
-    conn.commit()
+
+
+def main():
+    cur, conn = setUpDatabase("project.db")
+    
+    bitcoin_table(cur, conn)
+main()
