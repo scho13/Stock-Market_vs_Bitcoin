@@ -13,6 +13,13 @@ def setUpDatabase(db_name):
     cur = conn.cursor()
     return cur, conn
 
+def stock_api():
+    response_API = requests.get('https://api.twelvedata.com/time_series?symbol=DJI&interval=1day&start_date=2022-01-01&end_date=2022-04-02&apikey=e7702bf29d4148cca08ed5c4180e21eb')
+    data = response_API.text
+    parse_json = json.loads(data)
+    return parse_json
+
+print(stock_api())
 
 def bitcoin_api():
     base_url = "https://api.coinpaprika.com/v1/"
