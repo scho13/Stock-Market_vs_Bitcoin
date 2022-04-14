@@ -1,7 +1,8 @@
+from hashlib import new
 import sqlite3
 import os
 import unittest
-import json
+import json, collections
 import requests
 
 # Team Name: Machos
@@ -19,18 +20,21 @@ def stock_api():
     return data
 
 def stock_table(cur, conn):
-    cur.execute("CREATE TABLE IF NOT EXISTS Stock (date TEXT UNIQUE, open NUMBER, high NUMBER, low NUMBER, close NUMBER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS Stock (date TEXT UNIQUE, stock_open NUMBER, stock_high NUMBER, stock_low NUMBER, stock_close NUMBER)")
     
     data = stock_api()
+    new_data = sorted(data.items())
 
-    for i in data['values']:
+    print(new_data)
+
+    for i in new_data['values']:
         date = i['datetime'][:10]
         start = float(i['open'])
         high = float(i['high'])
         low = float(i['low'])
         close = float(i['close'])
 
-        cur.execute('INSERT OR IGNORE INTO Stock (date, open, high, low, close) VALUES (?,?,?,?,?)', (date, start, high, low, close))
+        cur.execute('INSERT OR IGNORE INTO Stock (date, stock_open, stock_high, stock_low, stock_close) VALUES (?,?,?,?,?)', (date, start, high, low, close))
 
     conn.commit()
 
@@ -45,7 +49,7 @@ def bitcoin_api():
 
 
 def bitcoin_table(cur, conn):
-    cur.execute("CREATE TABLE IF NOT EXISTS Bitcoin (date TEXT UNIQUE, open NUMBER, high NUMBER, low NUMBER, close NUMBER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS Bitcoin (date TEXT UNIQUE, bitcoin_open NUMBER, bitcoin_high NUMBER, bitcoin_low NUMBER, bitcoin_close NUMBER)")
     
     data = bitcoin_api()
 
@@ -56,7 +60,7 @@ def bitcoin_table(cur, conn):
         low = float(i['low'])
         close = float(i['close'])
 
-        cur.execute('INSERT OR IGNORE INTO Bitcoin (date, open, high, low, close) VALUES (?,?,?,?,?)', (date, start, high, low, close))
+        cur.execute('INSERT OR IGNORE INTO Bitcoin (date, bitcoin_open, bitcoin_high, bitcoin_low, bitcoin_close) VALUES (?,?,?,?,?)', (date, start, high, low, close))
 
     conn.commit()
 
@@ -68,4 +72,8 @@ def main():
     bitcoin_table(cur, conn)
     stock_table(cur, conn)
 
-main()
+
+
+if __name__ == "__main__":
+    main()
+    unittest.main(verbosity = 2)
