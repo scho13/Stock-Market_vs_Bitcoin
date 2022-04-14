@@ -23,11 +23,8 @@ def stock_table(cur, conn):
     cur.execute("CREATE TABLE IF NOT EXISTS Stock (date TEXT UNIQUE, stock_open NUMBER, stock_high NUMBER, stock_low NUMBER, stock_close NUMBER)")
     
     data = stock_api()
-    new_data = sorted(data.items())
 
-    print(new_data)
-
-    for i in new_data['values']:
+    for i in data['values']:
         date = i['datetime'][:10]
         start = float(i['open'])
         high = float(i['high'])
