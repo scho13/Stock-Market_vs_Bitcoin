@@ -14,16 +14,12 @@ def setUpDatabase(db_name):
     return cur, conn
 
 def stock_api():
-    response_API = requests.get('https://api.twelvedata.com/time_series?symbol=DJI&interval=1day&start_date=2022-01-01&end_date=2022-04-02&apikey=e7702bf29d4148cca08ed5c4180e21eb')
+    response_API = requests.get('https://api.twelvedata.com/time_series?symbol=DJI&interval=1day&start_date=2021-01-01&end_date=2022-01-01&apikey=e7702bf29d4148cca08ed5c4180e21eb')
     data = response_API.json()
-    #parse_json = json.loads(data)
     return data
 
-print(stock_api())
-
-
 def stock_table(cur, conn):
-    cur.execute("CREATE TABLE IF NOT EXISTS Stock (date TEXT, open NUMBER, high NUMBER, low NUMBER, close NUMBER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS Stock (date TEXT UNIQUE, open NUMBER, high NUMBER, low NUMBER, close NUMBER)")
     
     data = stock_api()
 
@@ -41,15 +37,15 @@ def stock_table(cur, conn):
 
 def bitcoin_api():
     base_url = "https://api.coinpaprika.com/v1/"
-    start_date = "2022-01-01"
-    end_date = "2022-04-01"
+    start_date = "2021-01-01"
+    end_date = "2021-12-31"
     response = requests.get(base_url + "coins/btc-bitcoin/ohlcv/historical?start=" + start_date + "&end=" + end_date)
     data = response.json()
     return data
 
 
 def bitcoin_table(cur, conn):
-    cur.execute("CREATE TABLE IF NOT EXISTS Bitcoin (date TEXT, open NUMBER, high NUMBER, low NUMBER, close NUMBER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS Bitcoin (date TEXT UNIQUE, open NUMBER, high NUMBER, low NUMBER, close NUMBER)")
     
     data = bitcoin_api()
 
