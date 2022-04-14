@@ -27,14 +27,14 @@ def stock_table(cur, conn):
     
     data = stock_api()
 
-    for i in data:
+    for i in data['values']:
         date = i['datetime'][:10]
         start = float(i['open'])
         high = float(i['high'])
         low = float(i['low'])
         close = float(i['close'])
 
-        cur.execute('INSERT OR IGNORE INTO Bitcoin (date, open, high, low, close) VALUES (?,?,?,?,?)', (date, start, high, low, close))
+        cur.execute('INSERT OR IGNORE INTO Stock (date, open, high, low, close) VALUES (?,?,?,?,?)', (date, start, high, low, close))
 
     conn.commit()
 
