@@ -15,7 +15,7 @@ def setUpDatabase(db_name):
     return cur, conn
 
 def stock_api():
-    response_API = requests.get('https://api.twelvedata.com/time_series?symbol=DJI&interval=1day&start_date=2021-01-01&end_date=2022-01-01&apikey=e7702bf29d4148cca08ed5c4180e21eb')
+    response_API = requests.get('https://api.twelvedata.com/time_series?symbol=DJI&interval=1day&start_date=2021-01-01&end_date=2022-01-01&order=ASC&apikey=e7702bf29d4148cca08ed5c4180e21eb')
     data = response_API.json()
     return data
 
@@ -40,8 +40,15 @@ def bitcoin_api():
     base_url = "https://api.coinpaprika.com/v1/"
     start_date = "2021-01-01"
     end_date = "2021-12-31"
-    response = requests.get(base_url + "coins/btc-bitcoin/ohlcv/historical?start=" + start_date + "&end=" + end_date)
-    data = response.json()
+    limit = "25"
+    #response = requests.get(base_url + "coins/btc-bitcoin/ohlcv/historical?start=" + start_date + "&end=" + end_date + "&limit=")
+    #data = response.json()
+    
+    for i in range(1,8):
+        limit = int(limit) * i
+        response = requests.get(base_url + "coins/btc-bitcoin/ohlcv/historical?start=" + start_date + "&end=" + end_date + "&limit=")
+        data = response.json()
+
     return data
 
 
