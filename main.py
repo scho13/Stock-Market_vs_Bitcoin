@@ -1,3 +1,4 @@
+from email import contentmanager
 from hashlib import new
 import sqlite3
 import os
@@ -39,14 +40,11 @@ def stock_table(cur, conn):
 def bitcoin_api():
     base_url = "https://api.coinpaprika.com/v1/"
     start_date = "2021-01-01"
-    end_date = "2021-12-31"
-    limit = "25"
-    #response = requests.get(base_url + "coins/btc-bitcoin/ohlcv/historical?start=" + start_date + "&end=" + end_date + "&limit=")
-    #data = response.json()
+    limit = 25
     
-    for i in range(1,8):
-        limit = int(limit) * i
-        response = requests.get(base_url + "coins/btc-bitcoin/ohlcv/historical?start=" + start_date + "&end=" + end_date + "&limit=")
+    while limit <= 150:
+        response = requests.get(base_url + "coins/btc-bitcoin/ohlcv/historical?start=" + start_date + "&limit=" + str(limit))
+        limit += 25
         data = response.json()
 
     return data
