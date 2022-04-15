@@ -67,12 +67,19 @@ def bitcoin_table(cur, conn):
     conn.commit()
 
 
+def join_tables(cur,conn):
+    cur.execute("SELECT Bitcoin.bitcoin_open, Stock.stock_open FROM Bitcoin JOIN Stock ON Bitcoin.date = Stock.date")
+    results = cur.fetchall()
+    conn.commit()
+    return results
+
 
 def main():
     cur, conn = setUpDatabase("project.db")
     
     bitcoin_table(cur, conn)
     stock_table(cur, conn)
+    join_tables(cur, conn)
 
 
 
