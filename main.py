@@ -76,7 +76,7 @@ def add_into_bitcoin_table(cur, conn, add):
 
 
 def join_tables(cur,conn):
-    cur.execute("SELECT Bitcoin.bitcoin_open, Stock.stock_open FROM Bitcoin JOIN Stock ON Bitcoin.date = Stock.date")
+    cur.execute("SELECT Bitcoin.bitcoin_close, Stock.stock_close FROM Bitcoin JOIN Stock ON Bitcoin.date = Stock.date")
     results = cur.fetchall()
     conn.commit()
     return results
