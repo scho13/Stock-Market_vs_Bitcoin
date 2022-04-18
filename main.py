@@ -20,21 +20,26 @@ def stock_api():
     data = response_API.json()
     return data
 
-def stock_table(cur, conn):
+def create_stock_table(cur, conn):
     cur.execute("CREATE TABLE IF NOT EXISTS Stock (date TEXT UNIQUE, stock_open NUMBER, stock_high NUMBER, stock_low NUMBER, stock_close NUMBER)")
-    
-    data = stock_api()
+    conn.commit()
 
-    for i in data['values']:
+def add_into_stock_table(cur, conn, add):
+    data = stock_api()
+    starting = 0 + add
+    limit = 25 + add
+    data_lst = []
+    for i in data['values'][starting:limit]:
         date = i['datetime'][:10]
         start = float(i['open'])
         high = float(i['high'])
         low = float(i['low'])
         close = float(i['close'])
+        data_lst.append((date, start, high, low, close))
+        for tup in data_lst:
+            cur.execute('INSERT OR IGNORE INTO Stock (date, stock_open, stock_high, stock_low, stock_close) VALUES (?,?,?,?,?)', (tup[0], tup[1], tup[2], tup[3], tup[4]))
 
-        cur.execute('INSERT OR IGNORE INTO Stock (date, stock_open, stock_high, stock_low, stock_close) VALUES (?,?,?,?,?)', (date, start, high, low, close))
-
-    conn.commit()
+        conn.commit()
 
 
 def bitcoin_api():
@@ -54,10 +59,10 @@ def create_bitcoin_table(cur, conn):
 
 def add_into_bitcoin_table(cur, conn, add):
     data = bitcoin_api()
-    start = 0 + add
+    starting = 0 + add
     limit = 25 + add
     data_lst = []
-    for i in data[start:limit]:
+    for i in data[starting:limit]:
         date = i['time_open'][:10]
         start = float(i['open'])
         high = float(i['high'])
@@ -85,7 +90,7 @@ def main():
     conn.commit()
     info = cur.fetchall()
     length = info[0][0]
-    print(length)
+    #print(length)
     if length < 25:
         add_into_bitcoin_table(cur, conn, 0)
     elif 25 <= length < 50:
@@ -98,7 +103,27 @@ def main():
         add_into_bitcoin_table(cur, conn, 100)
     elif 125 <= length < 150:
         add_into_bitcoin_table(cur, conn, 125)
-    stock_table(cur, conn)
+    print(length)
+    #Creates Stock table
+    create_stock_table(cur, conn)
+    cur.execute('SELECT COUNT(*) FROM Stock')
+    conn.commit()
+    length = info[0][0]
+    #print(length)
+    if length < 25:
+        add_into_stock_table(cur, conn, 0)
+    elif 25 <= length < 50:
+        add_into_stock_table(cur, conn, 25)
+    elif 50 <= length < 75:
+        add_into_stock_table(cur, conn, 50)
+    elif 75 <= length < 100:
+        add_into_stock_table(cur, conn, 75)
+    elif 100 <= length < 125:
+        add_into_stock_table(cur, conn, 100)
+    elif 125 <= length < 150:
+        add_into_stock_table(cur, conn, 125)
+    print(length)
+    
     join_tables(cur, conn)
 
 
