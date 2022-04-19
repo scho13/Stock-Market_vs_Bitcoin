@@ -1,10 +1,15 @@
-from email import contentmanager
-from hashlib import new
+#from email import contentmanager
+#from hashlib import new
 import sqlite3
 import os
 import unittest
 import json
 import requests
+#import numpy as np
+#import pandas as pd
+#from scipy.stats import pearsonr
+import statistics
+import math
 
 # Team Name: Machos
 # Group Members: Shin Cho and Rebecca Mao
@@ -76,14 +81,66 @@ def add_into_bitcoin_table(cur, conn, add):
 
 
 def join_tables(cur,conn):
-    cur.execute("SELECT Bitcoin.bitcoin_close, Stock.stock_close FROM Bitcoin JOIN Stock ON Bitcoin.date = Stock.date")
+    cur.execute("SELECT Stock.date, Bitcoin.bitcoin_close, Stock.stock_close FROM Bitcoin JOIN Stock ON Bitcoin.date = Stock.date")
     results = cur.fetchall()
     conn.commit()
     return results
 
+def correlation_calc(list_of_tuple):
+
+    bitcoin_list = []
+    stock_list = []
+    bitcoin_calc = []
+    stock_calc = []
+    upper_function = []
+    bitcoin_calc2 = []
+    stock_calc2 = []
+
+    #bitcoin and stock prices in a list
+    for date, bitcoin_price, stock_price in list_of_tuple:
+        bitcoin_list.append(bitcoin_price)
+        stock_list.append(stock_price)
+
+    #bitcoin and stock prices mean
+    bitcoin_avg = statistics.mean(bitcoin_list)
+    stock_avg = statistics.mean(stock_list)
+
+    #bitcoin and stock prices upper function
+    for i in range(len(bitcoin_list)):
+        bitcoin_calc.append(bitcoin_list[i] - bitcoin_avg)
+        stock_calc.append(stock_list[i] - stock_avg)
+
+    for num1, num2 in zip(bitcoin_calc, stock_calc):
+	    upper_function.append(num1 * num2)
+        
+    upper_final = sum(upper_function)
+
+    #bitcoin and stock prices lower function
+    for i in range(len(bitcoin_list)):
+        bitcoin_calc2.append((bitcoin_list[i] - bitcoin_avg)**2)
+        stock_calc2.append((stock_list[i] - stock_avg)**2)
+
+    lower_function = sum(bitcoin_calc2) 
+    lower_function2 = sum(stock_calc2)
+
+    lower_function3 = lower_function*lower_function2
+
+    lower_final = math.sqrt(lower_function3)
+
+    final = upper_final/lower_final
+    return final
+
+
+def write_correlation_calc(filename, correlation):
+    with open(filename, "w", newline="") as fileout:
+        fileout.write("Correlation between bitcoin price and DJI stock price:\n")
+        fileout.write("======================================================\n\n")
+        fileout.write(f"The correlation coefficient between bitcoin price and DJI stock price was r = {correlation}.\n")
+        fileout.close()
 
 def main():
     cur, conn = setUpDatabase("project.db")
+    
     #Creates Bitcoin table 
     create_bitcoin_table(cur, conn)
     cur.execute('SELECT COUNT(*) FROM Bitcoin')
@@ -104,6 +161,7 @@ def main():
     elif 125 <= length < 150:
         add_into_bitcoin_table(cur, conn, 125)
     print(length)
+    
     #Creates Stock table
     create_stock_table(cur, conn)
     cur.execute('SELECT COUNT(*) FROM Stock')
@@ -124,7 +182,11 @@ def main():
         add_into_stock_table(cur, conn, 125)
     print(length)
     
-    join_tables(cur, conn)
+
+    set_up_calculations = join_tables(cur, conn)
+    calculations = correlation_calc(set_up_calculations)
+    write_correlation_calc("calculations.txt", calculations)
+
 
 
 
