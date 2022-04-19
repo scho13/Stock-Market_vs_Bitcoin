@@ -182,7 +182,7 @@ def main():
         add_into_stock_table(cur, conn, 125)
     print(length)
     
-
+    #Calculate correlation coefficient
     set_up_calculations = join_tables(cur, conn)
     calculations = correlation_calc(set_up_calculations)
     write_correlation_calc("calculations.txt", calculations)
