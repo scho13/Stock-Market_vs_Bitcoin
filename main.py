@@ -1,5 +1,3 @@
-#from email import contentmanager
-#from hashlib import new
 import sqlite3
 import os
 import unittest
@@ -7,8 +5,6 @@ import json
 import requests
 import numpy as np
 import scipy.stats
-#import pandas as pd
-#from scipy.stats import pearsonr
 import statistics
 import math
 import matplotlib.pyplot as plt 
