@@ -5,11 +5,13 @@ import os
 import unittest
 import json
 import requests
-#import numpy as np
+import numpy as np
+import scipy.stats
 #import pandas as pd
 #from scipy.stats import pearsonr
 import statistics
 import math
+import matplotlib.pyplot as plt 
 
 # Team Name: Machos
 # Group Members: Shin Cho and Rebecca Mao
@@ -138,6 +140,32 @@ def write_correlation_calc(filename, correlation):
         fileout.write(f"The correlation coefficient between bitcoin price and DJI stock price was r = {correlation}.\n")
         fileout.close()
 
+def create_regression_line(list_of_tuple):
+    bitcoin_list = []
+    stock_list = []
+
+    for date, bitcoin_price, stock_price in list_of_tuple:
+        bitcoin_list.append(bitcoin_price)
+        stock_list.append(stock_price)
+
+    x = np.array(bitcoin_list)
+    y = np.array(stock_list)
+
+    slope, intercept, r, p, stderr = scipy.stats.linregress(bitcoin_list, stock_list)
+
+    line = f'Regression line: y={intercept:.2f}+{slope:.2f}x, r={r:.2f}'
+
+    fig, ax = plt.subplots()
+    plt.title('Bitcoin Price vs DJI Stock Price')
+    ax.plot(x, y, linewidth=0, marker='s', label='Data points')
+    ax.plot(x, intercept + slope * x, label=line)
+    ax.set_xlabel('Bitcoin Price')
+    ax.set_ylabel('DJI Stock Price')
+    ax.legend(facecolor='white')
+    plt.show()
+
+
+
 def main():
     cur, conn = setUpDatabase("project.db")
     
@@ -186,6 +214,9 @@ def main():
     set_up_calculations = join_tables(cur, conn)
     calculations = correlation_calc(set_up_calculations)
     write_correlation_calc("calculations.txt", calculations)
+
+    #Create Regression line Graph
+    create_regression_line(set_up_calculations)
 
 
 
