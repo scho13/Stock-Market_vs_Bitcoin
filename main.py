@@ -164,6 +164,29 @@ def create_regression_line(list_of_tuple):
     ax.legend(facecolor='white')
     plt.show()
 
+def create_heat_map(list_of_tuple):
+    bitcoin_list = []
+    stock_list = []
+
+    for date, bitcoin_price, stock_price in list_of_tuple:
+        bitcoin_list.append(bitcoin_price)
+        stock_list.append(stock_price)
+
+    xy = np.array([bitcoin_list, stock_list])
+    corr_matrix = np.corrcoef(xy).round(decimals=2)
+
+    fig, ax = plt.subplots()
+    im = ax.imshow(corr_matrix)
+    im.set_clim(-1, 1)
+    ax.grid(False)
+    ax.xaxis.set(ticks=(0, 1), ticklabels=('Bitcoin Price', 'DJI Stock Price'))
+    ax.yaxis.set(ticks=(0, 1), ticklabels=('Bitcoin Price', 'DJI Stock Price'))
+    ax.set_ylim(1.5, -0.5)
+    for i in range(2):
+        for j in range(2):
+            ax.text(j, i, corr_matrix[i, j], ha='center', va='center', color='r')
+    cbar = ax.figure.colorbar(im, ax=ax, format='% .2f')
+    plt.show()
 
 
 def main():
@@ -217,6 +240,9 @@ def main():
 
     #Create Regression line Graph
     create_regression_line(set_up_calculations)
+
+    #Create Heat map Graph
+    create_heat_map(set_up_calculations)
 
 
 
