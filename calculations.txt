@@ -1,0 +1,4 @@
+Correlation between bitcoin price and DJI stock price:
+======================================================
+
+The correlation coefficient between bitcoin price and DJI stock price was r = 0.5738363390166138.
