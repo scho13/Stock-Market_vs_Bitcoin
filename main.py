@@ -12,21 +12,25 @@ import matplotlib.pyplot as plt
 # Team Name: Machos
 # Group Members: Shin Cho and Rebecca Mao
 
+# Create database
 def setUpDatabase(db_name):
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/'+db_name)
     cur = conn.cursor()
     return cur, conn
 
+# Get DJI Stock API data in json
 def stock_api():
     response_API = requests.get('https://api.twelvedata.com/time_series?symbol=DJI&interval=1day&start_date=2021-01-01&end_date=2022-01-01&order=ASC&apikey=e7702bf29d4148cca08ed5c4180e21eb')
     data = response_API.json()
     return data
 
+# Create DJI Stock table
 def create_stock_table(cur, conn):
     cur.execute("CREATE TABLE IF NOT EXISTS Stock (date TEXT UNIQUE, stock_open NUMBER, stock_high NUMBER, stock_low NUMBER, stock_close NUMBER)")
     conn.commit()
 
+# Compile DJI Stock API data into database
 def add_into_stock_table(cur, conn, add):
     data = stock_api()
     starting = 0 + add
@@ -44,7 +48,7 @@ def add_into_stock_table(cur, conn, add):
 
         conn.commit()
 
-
+# Get Bitcoin API data in json
 def bitcoin_api():
     base_url = "https://api.coinpaprika.com/v1/"
     start_date = "2021-01-01"
@@ -55,11 +59,12 @@ def bitcoin_api():
 
     return data
 
-
+# Create Bitcoin table
 def create_bitcoin_table(cur, conn):
     cur.execute("CREATE TABLE IF NOT EXISTS Bitcoin (date TEXT UNIQUE, bitcoin_open NUMBER, bitcoin_high NUMBER, bitcoin_low NUMBER, bitcoin_close NUMBER)")
     conn.commit()
 
+# Compile Bitcoin API data into database
 def add_into_bitcoin_table(cur, conn, add):
     data = bitcoin_api()
     starting = 0 + add
@@ -77,13 +82,14 @@ def add_into_bitcoin_table(cur, conn, add):
          
         conn.commit()
 
-
+# Join DJI Stock data and Bitcoin data
 def join_tables(cur,conn):
     cur.execute("SELECT Stock.date, Bitcoin.bitcoin_close, Stock.stock_close FROM Bitcoin JOIN Stock ON Bitcoin.date = Stock.date")
     results = cur.fetchall()
     conn.commit()
     return results
 
+# Calculate correlation coefficient
 def correlation_calc(list_of_tuple):
 
     bitcoin_list = []
@@ -128,7 +134,7 @@ def correlation_calc(list_of_tuple):
     final = upper_final/lower_final
     return final
 
-
+# Write the correlation coefficient in a file
 def write_correlation_calc(filename, correlation):
     with open(filename, "w", newline="") as fileout:
         fileout.write("Correlation between bitcoin price and DJI stock price:\n")
@@ -136,6 +142,7 @@ def write_correlation_calc(filename, correlation):
         fileout.write(f"The correlation coefficient between bitcoin price and DJI stock price was r = {correlation}.\n")
         fileout.close()
 
+# Create regression line graph
 def create_regression_line(list_of_tuple):
     bitcoin_list = []
     stock_list = []
@@ -160,6 +167,7 @@ def create_regression_line(list_of_tuple):
     ax.legend(facecolor='white')
     plt.show()
 
+# Create heat map graph
 def create_heat_map(list_of_tuple):
     bitcoin_list = []
     stock_list = []
@@ -194,7 +202,7 @@ def main():
     conn.commit()
     info = cur.fetchall()
     length = info[0][0]
-    #print(length)
+    
     if length < 25:
         add_into_bitcoin_table(cur, conn, 0)
     elif 25 <= length < 50:
@@ -207,14 +215,14 @@ def main():
         add_into_bitcoin_table(cur, conn, 100)
     elif 125 <= length < 150:
         add_into_bitcoin_table(cur, conn, 125)
-    print(length)
+    #print(length)
     
     #Creates Stock table
     create_stock_table(cur, conn)
     cur.execute('SELECT COUNT(*) FROM Stock')
     conn.commit()
     length = info[0][0]
-    #print(length)
+    
     if length < 25:
         add_into_stock_table(cur, conn, 0)
     elif 25 <= length < 50:
@@ -227,7 +235,7 @@ def main():
         add_into_stock_table(cur, conn, 100)
     elif 125 <= length < 150:
         add_into_stock_table(cur, conn, 125)
-    print(length)
+    #print(length)
     
     #Calculate correlation coefficient
     set_up_calculations = join_tables(cur, conn)
